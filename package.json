@@ -1,7 +1,7 @@
 {
   "name": "prisma-custom-field-encryption",
   "version": "0.0.1",
-  "description": "Transparent and customizable field-level encryption at rest for Prisma",
+  "description": "Transparent and customizable field-level encryption at rest for Prisma based on prisma-field-encryption package",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
@@ -9,8 +9,8 @@
     "prisma-custom-field-encryption": "./dist/generator/main.js"
   },
   "author": {
-    "name": "Victor Rodrigues",
-    "email": "marcelo.victor05@gmail.com"
+    "name": "Anfitrião Prime",
+    "email": "desenvolvimento@anfitriaoprime.com.br"
   },
   "repository": {
     "type": "git",
