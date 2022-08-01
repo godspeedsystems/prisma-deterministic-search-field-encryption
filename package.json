@@ -52,7 +52,7 @@
     "object-path": "^0.11.8"
   },
   "peerDependencies": {
-    "@prisma/client": "^3.8.0"
+    "@prisma/client": "^3.8.0 || ^4"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^16.2.4",
