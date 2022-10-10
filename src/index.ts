@@ -1,14 +1,16 @@
 import { analyseDMMF } from './dmmf'
-import { configureKeys, decryptOnRead, encryptOnWrite } from './encryption'
+import {
+  decryptOnRead,
+  encryptOnWrite,
+  configureKeysAndFunctions
+} from './encryption'
 import type { Configuration, Middleware, MiddlewareParams } from './types'
 
-export function fieldEncryptionMiddleware<
-  Models extends string = any,
-  Actions extends string = any
->(config: Configuration = {}): Middleware<Models, Actions> {
-  // This will throw if the encryption key is missing
-  // or if anything is invalid.
-  const keys = configureKeys(config)
+export function fieldEncryptionMiddleware(
+  config: Configuration = {}
+): Middleware {
+  const { cipherFunctions, keys, method } = configureKeysAndFunctions(config)
+
   const models = analyseDMMF(
     config.dmmf ?? require('@prisma/client').Prisma.dmmf
   )
@@ -24,9 +26,28 @@ export function fieldEncryptionMiddleware<
     const operation = `${params.model}.${params.action}`
     // Params are mutated in-place for modifications to occur.
     // See https://github.com/prisma/prisma/issues/9522
-    const encryptedParams = encryptOnWrite(params, keys, models, operation)
+
+    const encryptedParams = encryptOnWrite(
+      params,
+      models,
+      operation,
+      method,
+      keys,
+      cipherFunctions?.encryptFn
+    )
+
     let result = await next(encryptedParams)
-    decryptOnRead(encryptedParams, result, keys, models, operation)
+
+    decryptOnRead(
+      encryptedParams,
+      result,
+      models,
+      operation,
+      method,
+      keys,
+      cipherFunctions?.decryptFn
+    )
+
     return result
   }
 }
