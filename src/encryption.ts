@@ -156,9 +156,10 @@ export function encryptOnWrite<Models extends string, Actions extends string>(
   keys: KeysConfiguration | null,
   encryptFn?: EncryptionFn
 ) {
-  if (!writeOperations.includes(params.action)) {
-    return params // No input data to encrypt
-  }
+  // Commenting this code so as to apply encryption in all the methods so that in case of deterministic algorithm, search operation can be performed on the encrypted field.
+  // if (!writeOperations.includes(params.action)) {
+  //   return params // No input data to encrypt
+  // }
 
   const encryptionErrors: string[] = []
 
