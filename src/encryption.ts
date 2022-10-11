@@ -200,17 +200,17 @@ export function encryptOnWrite(
             errors.fieldEncryptionError(model, field, path, error)
           )
         }
-      }
-    )
-  })
+      )
+    }
+  )
   if (encryptionErrors.length > 0) {
     throw new Error(errors.encryptionErrorReport(operation, encryptionErrors))
   }
   return mutatedParams
 }
 
-export function decryptOnRead(
-  params: MiddlewareParams,
+export function decryptOnRead<Models extends string, Actions extends string>(
+  params: MiddlewareParams<Models, Actions>,
   result: any,
   models: DMMFModels,
   operation: string,
