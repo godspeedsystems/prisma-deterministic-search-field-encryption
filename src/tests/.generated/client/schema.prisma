@@ -1,0 +1,42 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+  output          = "../src/tests/.generated/client"
+}
+
+// generator fieldEncryptionMigrations {
+//   provider = "prisma-field-encryption"
+//   output   = "../src/tests/migrations"
+// }
+
+model User {
+  id           Int     @id @default(autoincrement())
+  email        String  @unique
+  name         String? /// @encrypted
+  posts        Post[]
+  pinnedPost   Post?   @relation(fields: [pinnedPostId], references: [id], name: "pinnedPost")
+  pinnedPostId Int?
+}
+
+model Post {
+  id         Int        @id @default(autoincrement())
+  title      String
+  content    String? /// @encrypted
+  published  Boolean    @default(false)
+  author     User?      @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  authorId   Int?
+  categories Category[]
+  havePinned User[]     @relation("pinnedPost")
+}
+
+// Model without encrypted fields
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  posts Post[]
+}

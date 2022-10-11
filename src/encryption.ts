@@ -148,8 +148,8 @@ const writeOperations = [
 
 const whereClauseRegExp = /\.where\./
 
-export function encryptOnWrite(
-  params: MiddlewareParams,
+export function encryptOnWrite<Models extends string, Actions extends string>(
+  params: MiddlewareParams<Models, Actions>,
   models: DMMFModels,
   operation: string,
   method: Method,
@@ -162,7 +162,7 @@ export function encryptOnWrite(
 
   const encryptionErrors: string[] = []
 
-  const mutatedParams = produce(params, (draft: Draft<MiddlewareParams>) => {
+  const mutatedParams = produce(params, (draft: Draft<MiddlewareParams<Models, Actions>>) => {
     visitInputTargetFields(
       draft,
       models,
@@ -209,8 +209,8 @@ export function encryptOnWrite(
   return mutatedParams
 }
 
-export function decryptOnRead(
-  params: MiddlewareParams,
+export function decryptOnRead<Models extends string, Actions extends string>(
+  params: MiddlewareParams<Models, Actions>,
   result: any,
   models: DMMFModels,
   operation: string,

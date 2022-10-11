@@ -6,16 +6,21 @@ import {
 } from './encryption'
 import type { Configuration, Middleware, MiddlewareParams } from './types'
 
-export function fieldEncryptionMiddleware(
+export function fieldEncryptionMiddleware<
+Models extends string = any,
+Actions extends string = any
+>(
   config: Configuration = {}
-): Middleware {
+): Middleware<Models, Actions> {
   const { cipherFunctions, keys, method } = configureKeysAndFunctions(config)
 
-  const models = analyseDMMF()
+  const models = analyseDMMF(
+    config.dmmf ?? require('@prisma/client').Prisma.dmmf
+  )
 
   return async function fieldEncryptionMiddleware(
-    params: MiddlewareParams,
-    next: (params: MiddlewareParams) => Promise<any>
+    params: MiddlewareParams<Models, Actions>,
+    next: (params: MiddlewareParams<Models, Actions>) => Promise<any>
   ) {
     if (!params.model) {
       // Unsupported operation

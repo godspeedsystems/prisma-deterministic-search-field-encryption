@@ -27,9 +27,9 @@
   },
   "scripts": {
     "clean": "rm -rf ./dist ./coverage",
-    "prebuild": "run-s generate:prisma",
+    "prebuild1": "run-s generate:prisma",
     "build": "tsc",
-    "postbuild": "chmod +x ./dist/generator/main.js && cd node_modules/.bin && ln -sf ../../dist/generator/main.js ./prisma-field-encryption",
+    "postbuild1": "chmod +x ./dist/generator/main.js && cd node_modules/.bin && ln -sf ../../dist/generator/main.js ./prisma-field-encryption",
     "generate": "run-s generate:*",
     "generate:prisma": "prisma generate",
     "generate:dmmf": "ts-node ./src/scripts/generateDMMF.ts",
@@ -49,7 +49,8 @@
     "@47ng/cloak": "^1.1.0-beta.2",
     "@prisma/generator-helper": "^3.13.0",
     "immer": "^9.0.12",
-    "object-path": "^0.11.8"
+    "object-path": "^0.11.8",
+    "zod": "^3.15.1"
   },
   "peerDependencies": {
     "@prisma/client": "^3.8.0 || ^4"

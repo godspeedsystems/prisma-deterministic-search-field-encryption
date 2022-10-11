@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client'
+import type { DMMFField, DMMFModel } from './types'
 
 const header = '[prisma-field-encryption]'
 
@@ -13,7 +13,7 @@ export const errors = {
   invalidFunctionsConfiguration: prefixError(
     'invalid cipher functions configuration provided.'
   ),
-  unsupportedFieldType: (model: Prisma.DMMF.Model, field: Prisma.DMMF.Field) =>
+  unsupportedFieldType: (model: DMMFModel, field: DMMFField) =>
     prefixError(
       `encryption enabled for field ${model.name}.${field.name} of unsupported type ${field.type}: only String fields can be encrypted.`
     ),
