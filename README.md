@@ -14,9 +14,9 @@
 ## Installation
 
 ```shell
-$ yarn add prisma-deterministic-search-field-encryption
+$ yarn add @mindgrep/prisma-deterministic-search-field-encryption
 # or
-$ npm i prisma-deterministic-search-field-encryption
+$ npm i @mindgrep/prisma-deterministic-search-field-encryption
 ```
 
 > _Note: this requires Prisma 3.8.0 or higher._
@@ -27,7 +27,7 @@ $ npm i prisma-deterministic-search-field-encryption
 
 ```ts
 import { PrismaClient } from '@prisma/client'
-import { fieldEncryptionMiddleware } from 'prisma-deterministic-search-field-encryption'
+import { fieldEncryptionMiddleware } from '@mindgrep/prisma-deterministic-search-field-encryption'
 
 export const client = new PrismaClient()
 
@@ -41,7 +41,7 @@ _Any middleware registered after field encryption will receive encrypted data fo
 
 ### 2. Setup your configuration
 
-You can use two distinct configuration setups. The first is using encryption key and the other way is using your own encrypt/decript functions and logic:
+You can use your own encrypt/decript functions and logic:
 
 #### 2.1. Using your own encrypt/decript functions
 

@@ -1,6 +1,6 @@
 {
-  "name": "prisma-deterministic-search-field-encryption",
-  "version": "0.0.1",
+  "name": "@mindgrep/prisma-deterministic-search-field-encryption",
+  "version": "0.0.3",
   "description": "Transparent and customizable field-level encryption at rest for Prisma based on prisma-field-encryption package",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
