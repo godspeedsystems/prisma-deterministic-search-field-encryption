@@ -1,5 +1,5 @@
 {
-  "name": "prisma-custom-field-encryption",
+  "name": "prisma-deterministic-search-field-encryption",
   "version": "0.0.1",
   "description": "Transparent and customizable field-level encryption at rest for Prisma based on prisma-field-encryption package",
   "main": "dist/index.js",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Vitu-77/prisma-field-encryption"
+    "url": "https://github.com/gurjotkaur20/prisma-deterministic-search-field-encryption"
   },
   "keywords": [
     "prisma",
@@ -29,7 +29,7 @@
     "clean": "rm -rf ./dist ./coverage",
     "prebuild1": "run-s generate:prisma",
     "build": "tsc",
-    "postbuild1": "chmod +x ./dist/generator/main.js && cd node_modules/.bin && ln -sf ../../dist/generator/main.js ./prisma-field-encryption",
+    "postbuild": "chmod +x ./dist/generator/main.js && cd node_modules/.bin && ln -sf ../../dist/generator/main.js ./prisma-deterministic-search-field-encryption",
     "generate": "run-s generate:*",
     "generate:prisma": "prisma generate",
     "generate:dmmf": "ts-node ./src/scripts/generateDMMF.ts",

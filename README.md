@@ -1,4 +1,4 @@
-<h1 align="center"><code>prisma-custom-field-encryption</code></h1>
+<h1 align="center"><code>prisma-deterministic-search-field-encryption</code></h1>
 
 <div align="center">
 
@@ -9,14 +9,14 @@
 
 </div>
 
-<p align="center">Transparent and customizable field-level encryption at rest for Prisma based on  <a href="https://github.com/47ng/prisma-field-encryption" target="_blank">prisma-field-encryption</a> package.</p>
+<p align="center">Transparent and customizable field-level encryption at rest for Prisma using deterministic static algorithm based on  <a href="https://github.com/Vitu-77/prisma-field-encryption" target="_blank">prisma-custom-field-encryption</a> package. You can also perform queries over encrypted fields. </p>
 
 ## Installation
 
 ```shell
-$ yarn add prisma-field-encryption
+$ yarn add prisma-deterministic-search-field-encryption
 # or
-$ npm i prisma-field-encryption
+$ npm i prisma-deterministic-search-field-encryption
 ```
 
 > _Note: this requires Prisma 3.8.0 or higher._
@@ -27,7 +27,7 @@ $ npm i prisma-field-encryption
 
 ```ts
 import { PrismaClient } from '@prisma/client'
-import { fieldEncryptionMiddleware } from 'prisma-field-encryption'
+import { fieldEncryptionMiddleware } from 'prisma-deterministic-search-field-encryption'
 
 export const client = new PrismaClient()
 
@@ -43,49 +43,9 @@ _Any middleware registered after field encryption will receive encrypted data fo
 
 You can use two distinct configuration setups. The first is using encryption key and the other way is using your own encrypt/decript functions and logic:
 
-> ⚠️ **Both ways are mutually exclusive, so using one of the configurations prevents you from using the other.**
+#### 2.1. Using your own encrypt/decript functions
 
-#### 2.1. Using encryption key
-
-Generate an encryption key:
-
-- Via a web UI: [cloak.47ng.com](https://cloak.47ng.com)
-- Via the command line:
-
-```shell
-$ cloak generate
-```
-
-> _Note: the `cloak` CLI comes pre-installed with `prisma-field-encryption` as part of the [`@47ng/cloak`](https://github.com/47ng/cloak) dependency._
-
-The preferred method to provide your key is via the `PRISMA_FIELD_ENCRYPTION_KEY`
-environment variable:
-
-```shell
-# .env
-PRISMA_FIELD_ENCRYPTION_KEY=k1.aesgcm256.DbQoar8ZLuUsOHZNyrnjlskInHDYlzF3q6y1KGM7DUM=
-```
-
-You can also pass it directly in the configuration:
-
-```ts
-client.$use(
-  fieldEncryptionMiddleware({
-    // Don't version hardcoded keys though, this is an example:
-    encryptionKey: 'k1.aesgcm256.DbQoar8ZLuUsOHZNyrnjlskInHDYlzF3q6y1KGM7DUM='
-  })
-)
-```
-
-_Tip: a key provided in code will take precedence over a key from the environment._
-
-> ⚠️ **When using this method you will not be able to perform queries using encrypted fields.**
-
-#### 2.2. Using your own encrypt/decript functions
-
-Using your own functions is useful when you want full control over the cryptograph logic or whe you want to **perform queries over encrypted fields**, since you can use some static encryption algorithm. as static encryptions always generate the same hash for similar texts, you can encrypt the search field before performing the query.
-
-First of all you must define your encryp/decrypt functions and pass then directly in the middleware config.
+You must define your encryp/decrypt functions and pass then directly in the middleware config.
 
 The following example shows using the native nodejs crypto module to perform encryption and decryption:
 
@@ -162,132 +122,6 @@ $ prisma generate
 
 You're done!
 
-## Migrations
-
-Adding encryption to an existing field is a transparent operation: Prisma will
-encrypt data on new writes, and decrypt on read when data is encrypted, but
-your existing data will remain in clear text.
-
-Encrypting existing data should be done in a migration. The package comes with
-a built-in automatic migration generator, in the form of a Prisma generator:
-
-```prisma
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
-}
-
-generator fieldEncryptionMigrations {
-  provider = "prisma-field-encryption"
-  output   = "./where/you/want/your/migrations"
-}
-```
-
-_Tip: the migrations generator makes use of the `interactiveTransactions` preview feature. Make sure it's enabled on your Prisma Client generator._
-
-Your migrations directory will contain:
-
-- One migration per model
-- An `index.ts` file that runs them all concurrently
-
-All migrations files follow the same API:
-
-```ts
-export async function migrate(
-  client: PrismaClient,
-  reportProgress?: ProgressReportCallback
-)
-```
-
-The progress report callback is optional, and will log progress to the console
-if ommitted.
-
-### Following Migrations Progress
-
-A progress report is an object with the following fields:
-
-- `model`: The model name
-- `processed`: How many records have been processed
-- `totalCount`: How many records were present at the start of the migration
-- `performance`: How long it took to update the last record (in ms)
-
-Note: because the totalCount is only computed once, additions or deletions
-while a migration is running may cause the final processedCount to not equal
-totalCount.
-
-### Custom Cursors
-
-Records will be iterated upon by increasing order of a **cursor** field.
-
-A cursor field has to respect the following constraints:
-
-- Be `@unique`
-- Not be encrypted itself
-
-By default, records will try to use the `@id` field.
-
-> Note: Compound `@@id` primary keys are not supported.
-
-If the `@id` field does not satisfy cursor constraints, the generator will
-fallback to the first field that satisfies those constraints.
-
-If you wish to iterate over another field, you can do so by annotating the
-desired field with `@encryption:cursor`:
-
-```prisma
-model User {
-  id     Int    @id       // Generator would use this by default
-  email  String @unique  /// @encryption:cursor <- iterate over this field instead
-}
-```
-
-Migrations will look for cursor fields in your models in this order:
-
-1. Fields explictly annotated with `@encryption:cursor`
-2. The `@id` field
-3. The first `@unique` field
-
-If no cursor is found for a model with encrypted fields, the generator will
-throw an error when running `prisma generate`.
-
-## Key Management
-
-This library is based on [@47ng/cloak](https://github.com/47ng/cloak), which comes
-with key management built-in. Here are the basic principles:
-
-- You have one current encryption key
-- You can have many decryption keys for existing data
-
-This allows seamless rotation of the encryption key:
-
-1. Generate a new encryption key
-2. Add the old one to the decryption keys
-
-The `PRISMA_FIELD_DECRYPTION_KEYS` can contain a comma-separated list of keys
-to use for decryption:
-
-```shell
-PRISMA_FIELD_DECRYPTION_KEYS=key1,key2,key3
-```
-
-Or specify keys programmatically:
-
-```ts
-prismaClient.$use(
-  fieldEncryptionMiddleware({
-    decryptionKeys: [
-      'k1.aesgcm256.DbQoar8ZLuUsOHZNyrnjlskInHDYlzF3q6y1KGM7DUM='
-      // Add other keys here. Order does not matter.
-    ]
-  })
-)
-```
-
-_Tip: the current encryption key is already part of the decryption keys, no need to add it there._
-
-Key rotation on existing fields (decrypt with old key and re-encrypt with the
-new one) is done by [data migrations](#migrations).
-
 ## Custom Prisma Client Location
 If you are generating your Prisma client to a custom location, you'll need to
 tell the middleware where to look for the DMMF _(the internal AST generated by Prisma that we use to read those triple-slash comments)_:
@@ -299,29 +133,9 @@ prismaClient.$use(
   })
 )
 ```
-
-**Roadmap:**
-
-- [x] Provide multiple decryption keys
-- [x] Add facilities for migrations & key rotation
-- [ ] Add compatibility with [@47ng/cloak](https://github.com/47ng/cloak) keychain environments
-
 ## Caveats & Limitations
 
 You can only encrypt `String` fields.
-
-You cannot filter on encrypted fields:
-
-```ts
-// User.name has an /// @encrypted annotation
-
-// This will always return empty results:
-prisma.user.findUnique({ where: { name: 'secret' } })
-```
-
-This is because the encryption is not deterministic: encrypting the same input multiple times will yield different outputs, due to the use of random initialisation vectors. Therefore Prisma cannot match the query to the data.
-
-For the same reason, indexes should not be placed on encrypted fields.
 
 [Raw database access](https://www.prisma.io/docs/concepts/components/prisma-client/raw-database-access)
 operations are not supported.
