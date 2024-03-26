@@ -48,7 +48,8 @@ const dmmfModelParser = z.object({
 
 export const dmmfDocumentParser = z.object({
   datamodel: z.object({
-    models: z.array(dmmfModelParser)
+    models: z.array(dmmfModelParser),
+    types:  z.array(dmmfModelParser)
   })
 })
 
